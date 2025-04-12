@@ -28,9 +28,21 @@ export default function DailyBuzzwordsScreen({ navigation }) {
             Alert.alert('Error', 'Failed to submit');
         }
     };
-
+    const allFilled = buzzwords.every(word => inputs[word.id] && inputs[word.id].trim().length > 6);
+    const today = new Date().toLocaleDateString(undefined, {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+    });
     return (
+
         <ScrollView contentContainerStyle={{ padding: 20 }}>
+            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+                Today's Buzzwords – {today}
+            </Text>
+            <Button title="View All Submissions" onPress={() => navigation.navigate('AllSubmissions')} />
+
+
             {buzzwords.map(word => (
                 <View key={word.id}>
                     <BuzzwordCard
@@ -50,9 +62,17 @@ export default function DailyBuzzwordsScreen({ navigation }) {
                         value={inputs[word.id] || ''}
                         onChangeText={text => handleChange(word.id, text)}
                     />
+                    {/* ✅ SUCCESS CHECK MARK */}
+                    {inputs[word.id] && inputs[word.id].trim().length > 10 && (
+                        <Text style={{ color: 'green', marginTop: 5 }}>✅ Ready</Text>
+                    )}
                 </View>
             ))}
-            <Button title="Submit All" onPress={handleSubmit} />
+            <Button
+                title="Submit All"
+                onPress={handleSubmit}
+                disabled={!allFilled}
+            />
         </ScrollView>
     );
 }
