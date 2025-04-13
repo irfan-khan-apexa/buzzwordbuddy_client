@@ -102,11 +102,12 @@ export default function ReviewAllScreen() {
                                     {s.Buzzword?.term}
                                 </Text>
                                 <Text style={{ fontSize: 14, marginBottom: 3 }}>{s.user_sentence}</Text>
+                                <Text style={{ fontSize: 14, marginBottom: 3 }}>Rating: {s.rating}</Text>
                                 <Text style={{ fontSize: 12, color: '#999' }}>
                                     {new Date(s.created_at).toLocaleString()}
                                 </Text>
                             </View>
-                        ))
+                        )).reverse()
                     )}
                 </>
             )}

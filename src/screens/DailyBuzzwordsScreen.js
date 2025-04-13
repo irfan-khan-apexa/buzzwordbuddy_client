@@ -9,6 +9,7 @@ export default function DailyBuzzwordsScreen({ navigation }) {
 
     useEffect(() => {
         getDailyBuzzwords().then(setBuzzwords);
+        // getDailyBuzzwords("2025-04-13").then(setBuzzwords);
     }, []);
 
     const handleChange = (termId, text) => {
@@ -17,17 +18,31 @@ export default function DailyBuzzwordsScreen({ navigation }) {
 
     const handleSubmit = async () => {
         try {
+            const feedbackArray = [];
+
             for (const word of buzzwords) {
                 const text = inputs[word.id];
                 if (text) {
-                    await submitSentence({ term_id: word.id, user_sentence: text });
+                    const response = await submitSentence({ term_id: word.id, user_sentence: text });
+                    feedbackArray.push({
+                        term: word.term,
+                        sentence: text,
+                        feedback: response.feedback,
+                    });
                 }
             }
-            navigation.navigate('Success');
+
+            // Navigate and pass feedback to next screen
+            navigation.navigate('Success', { feedbackList: feedbackArray });
+
         } catch (err) {
             Alert.alert('Error', 'Failed to submit');
         }
     };
+
+
+
+
     const allFilled = buzzwords.every(word => inputs[word.id] && inputs[word.id].trim().length > 6);
     const today = new Date().toLocaleDateString(undefined, {
         weekday: 'long',

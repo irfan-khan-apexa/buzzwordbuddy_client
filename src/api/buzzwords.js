@@ -8,6 +8,12 @@ export const getDailyBuzzwords = async () => {
     const response = await axios.get(`${API_BASE}/daily`);
     return response.data;
 };
+// cheat api 
+// export const getDailyBuzzwords = async (date = null) => {
+//     const query = date ? `?date=${date}` : '';
+//     const res = await fetch(`${API_BASE}/daily`);
+//     return res.json();
+// };
 
 export const submitSentence = async ({ term_id, user_sentence }) => {
     const response = await axios.post(`${API_BASE}/use`, {

@@ -1,38 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
-import { getDailyBuzzwords } from '../api/buzzwords';
-import { getFeedbackForSentence } from '../api/buzzwords';
+import React from 'react';
+import { View, Text, ScrollView } from 'react-native';
 
-export default function SubmissionSuccessScreen() {
-    const [feedbackList, setFeedbackList] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const loadFeedback = async () => {
-            try {
-                const words = await getDailyBuzzwords();
-                const storedSubmissions = await Promise.all(
-                    words.map(async (word) => {
-                        const response = await getFeedbackForSentence({
-                            term: word.term,
-                            sentence: `My sentence using the word '${word.term}' goes here...`, // ⚠️ replace with real sentence if tracked
-                        });
-                        return {
-                            term: word.term,
-                            feedback: response,
-                        };
-                    })
-                );
-                setFeedbackList(storedSubmissions);
-                setLoading(false);
-            } catch (err) {
-                console.error('Feedback loading error:', err);
-                setLoading(false);
-            }
-        };
-
-        loadFeedback();
-    }, []);
+export default function SubmissionSuccessScreen({ route }) {
+    const { feedbackList } = route.params;
 
     return (
         <ScrollView contentContainerStyle={{ padding: 20 }}>
@@ -40,16 +10,21 @@ export default function SubmissionSuccessScreen() {
                 🎉 Submission Complete!
             </Text>
 
-            {loading ? (
-                <ActivityIndicator size="large" />
-            ) : (
-                feedbackList.map((item, index) => (
-                    <View key={index} style={{ marginBottom: 20 }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{item.term}</Text>
-                        <Text style={{ color: '#666', marginTop: 5 }}>{item.feedback}</Text>
+            {feedbackList.map((item, index) => {
+                const ratingMatch = item.feedback.match(/Rating:\s*(\d)/);
+                const rating = ratingMatch ? parseInt(ratingMatch[1]) : null;
+
+                return (
+                    <View key={index} style={{ marginBottom: 20, padding: 15, backgroundColor: '#f9f9f9', borderRadius: 10 }}>
+                        <Text style={{ fontWeight: 'bold', fontSize: 18 }}>🔤 {item.term}</Text>
+                        {item.sentence && (
+                            <Text style={{ fontStyle: 'italic', color: '#333' }}>"{item.sentence}"</Text>
+                        )}
+                        <Text style={{ marginTop: 10, color: '#444' }}>{item.feedback}</Text>
+                        {rating && <Text style={{ marginTop: 5 }}>⭐️ Rating: {rating}/5</Text>}
                     </View>
-                ))
-            )}
+                );
+            })}
         </ScrollView>
     );
 }
